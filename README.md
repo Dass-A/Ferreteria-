@@ -1,59 +1,66 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Ferretería "El Tornillo" - Módulo de Pedidos Especiales
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Descripción
+Este módulo permite registrar pedidos especiales indicando material, cantidad, datos del cliente, teléfono, estado del pedido y fechas.  
+Según el pedido de Don Ramón
+"Los clientes piden materiales que no tenemos en stock: tubos especiales,
+pinturas específicas, herramientas raras. Anoto en papeles que después pierdo.
+Necesito registrar pedidos especiales: qué material, cantidad, nombre del
+cliente, teléfono, y estado: pedido a proveedor, en camino, llegó, entregado.
+La fecha del pedido que se ponga sola. Si me equivoco, poder corregir. Los
+entregados, ¿los borro? Mi hijo dice que guardemos para saber qué piden más.
+Ustedes opinen.
+A veces estoy en bodega y solo tengo el celular. Que pueda revisar desde ahí."
 
-## About Laravel
+## Justificación de no eliminación
+Los pedidos entregados no se borran, se quedan en otra lista completa, es decir se marcan como entregados, desaparece de la lista principal y si quiero volver a verlos debe presionamos lista completa para editar su pedido al igaul que si edita el pedido entregado este no  
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tabla: pedidos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Estructura de campos
+| Campo           | Tipo de dato (Laravel) | Tipo en BD (referencial) | Nulo | Default                  | Descripción |
+|----------------|-------------------------|---------------------------|------|--------------------------|-------------|
+| id             | id()                    | BIGINT UNSIGNED           | No   | Auto increment           | Identificador único del pedido |
+| cli_nombre     | string                  | VARCHAR(255)              | No   | -                        | Nombre del cliente |
+| cli_apellido   | string                  | VARCHAR(255)              | No   | -                        | Apellido del cliente |
+| telefono       | string                  | VARCHAR(255)              | No   | -                        | Teléfono del cliente (se valida que contenga solo números) |
+| material       | string                  | VARCHAR(255)              | No   | -                        | Material solicitado |
+| cantidad       | integer                 | INT                       | No   | -                        | Cantidad solicitada (mínimo 1) |
+| estado         | enum                    | ENUM                      | No   | pedido_a_proveedor       | Estado del pedido |
+| fecha_pedido   | timestamp               | TIMESTAMP                 | No   | CURRENT_TIMESTAMP        | Fecha/hora de creación del pedido |
+| fecha_entrega  | timestamp()->nullable() | TIMESTAMP                 | Sí   | NULL                     | Se asigna cuando el pedido pasa a entregado |
+| created_at     | timestamps()            | TIMESTAMP                 | Sí   | NULL                     | Registro automático de Laravel |
+| updated_at     | timestamps()            | TIMESTAMP                 | Sí   | NULL                     | Actualización automática de Laravel |
 
-## Learning Laravel
+### Valores permitidos para estado
+- pedido_a_proveedor
+- en_camino
+- llego
+- entregado
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Decisiones de diseño
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Estado como ENUM
+Se usa ENUM para evitar valores inválidos en el estado y mantener consistencia.  
+Además, se define un default de `pedido_a_proveedor` para que al crear un pedido no sea obligatorio enviar el estado.
 
-## Laravel Sponsors
+### fecha_pedido automática
+`fecha_pedido` se define con `useCurrent()` para que se registre automáticamente al crear el pedido, sin depender del usuario.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### fecha_entrega nullable y controlada por lógica
+`fecha_entrega` es NULL por defecto y solo se llena cuando el estado cambia a `entregado`.  
+Si un pedido se marca como entregado por error y luego se corrige a otro estado, la fecha de entrega se borra (vuelve a NULL).  
+Esto permite mantener un historial simple y coherente de entregas.
 
-### Premium Partners
+### Teléfono como string
+Se guarda como string para conservar ceros iniciales y evitar problemas de formato.  
+La validación del formulario controla que solo se ingresen números.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Migración
+La tabla se crea con la migración `create_pedidos_table` usando el siguiente esquema:
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Se crea `pedidos`
+- Se definen campos de cliente, pedido, estado y fechas
+- Se agregan `created_at` y `updated_at`
+- En `down()`, se elimina la tabla con `dropIfExists('pedidos')`
