@@ -13,7 +13,7 @@ Ustedes opinen.
 A veces estoy en bodega y solo tengo el celular. Que pueda revisar desde ahí."
 
 ## Justificación de no eliminación
-Los pedidos entregados no se borran, se quedan en otra lista completa, es decir se marcan como entregados, desaparece de la lista principal y si quiero volver a verlos debe presionamos lista completa para editar su pedido al igaul que si edita el pedido entregado este no  
+Los pedidos entregados no se borran, se quedan en otra lista completa, es decir se marcan como entregados, desaparece de la lista principal y si quiero volver a verlos debe presionamos lista completa para editar su pedido al igaul que si edita el pedido entregado este borra la fehc de entregado y queda vacía.
 
 
 ## Tabla: pedidos
