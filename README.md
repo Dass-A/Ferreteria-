@@ -1,5 +1,10 @@
 # Ferretería "El Tornillo" - Módulo de Pedidos Especiales
 
+## Link del Repositorio
+https://github.com/Dass-A/Ferreteria-
+
+## Autor
+Danny Yánez
 ## Descripción
 Este módulo permite registrar pedidos especiales indicando material, cantidad, datos del cliente, teléfono, estado del pedido y fechas.  
 Según el pedido de Don Ramón
@@ -50,8 +55,7 @@ Además, se define un default de `pedido_a_proveedor` para que al crear un pedid
 
 ### fecha_entrega nullable y controlada por lógica
 `fecha_entrega` es NULL por defecto y solo se llena cuando el estado cambia a `entregado`.  
-Si un pedido se marca como entregado por error y luego se corrige a otro estado, la fecha de entrega se borra (vuelve a NULL).  
-Esto permite mantener un historial simple y coherente de entregas.
+Si un pedido se marca como entregado por error y luego se corrige a otro estado, la fecha de entrega se borra vuelve a NULL y se maraca como - en la tabla de pedidos
 
 ### Teléfono como string
 Se guarda como string para conservar ceros iniciales y evitar problemas de formato.  
